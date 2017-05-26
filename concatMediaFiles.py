@@ -18,14 +18,21 @@ def generateListFile(dir):
 				minuteStr = str(minute)
 				minuteFilePath = hourFolderPath + "/" + minuteStr + FILE_EXT
 				if os.path.exists(minuteFilePath):
-					try:
-						f_minuteFile = open(minuteFilePath)
-						f_list_file.write("file " + "\'" + minuteFilePath + "\'" + "\n")
-						f_minuteFile.close()
 
-					except IOError, e:
+					t=os.popen('ffmpeg -v error -i ' + '\"' + minuteFilePath + '\"' + ' -f null - 2>&1').read()
+					if (t.find('atom not found') >= 0):
 						print 'file cannot open: ' + minuteFilePath
-						print sys.stderr, "Failed to open 'noexists' : %s" % e
+					else:
+						f_list_file.write("file " + "\'" + minuteFilePath + "\'" + "\n")
+
+					# try:
+					# 	f_minuteFile = open(minuteFilePath)
+					# 	f_list_file.write("file " + "\'" + minuteFilePath + "\'" + "\n")
+					# 	f_minuteFile.close()
+
+					# except IOError, e:
+					# 	print 'file cannot open: ' + minuteFilePath
+					# 	print sys.stderr, "Failed to open 'noexists' : %s" % e
 
 	f_list_file.close()
 
