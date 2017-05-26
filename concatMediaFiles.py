@@ -4,7 +4,7 @@ import os,sys
 LIST_FILE_NAME = "temp_mylist.txt"
 ERROR_FILE_NAME = "error.txt"
 FILE_EXT = ".mp4"
-global f_error
+f_error = None
 
 def generateListFile(dir):
 	global f_error
@@ -47,11 +47,11 @@ def concatMediaFiles(dataStr):
 # -------------- main, call from bat or shell script --------------
 if __name__ == '__main__':
 	if len(sys.argv) >= 2:
-		global f_error
 		f_error = open(ERROR_FILE_NAME, "w+")
 
 		dataRootPath = sys.argv[1]
 		for dateToConcat in os.listdir(dataRootPath):
+			print 'dateToConcat:', dateToConcat
 			# if dateToConcat == '2017-05-22':
 			# 	continue
 			dateFolderPath = dataRootPath + "/" + dateToConcat
