@@ -1,4 +1,6 @@
 import os,sys
+import print_progress
+import datetime
 
 # dateToConcat = "2017-01-01"
 LIST_FILE_NAME = "temp_mylist.txt"
@@ -6,9 +8,22 @@ ERROR_FILE_NAME = "error.txt"
 FILE_EXT = ".mp4"
 f_error = None
 
-def generateListFile(dir):
+def countFilesNum(dir):
+	count = 0
+	for entry in os.listdir(dir):
+		path = dir + "/" + entry
+		if os.path.isfile(path):
+			if path.endswith(FILE_EXT):
+				count = count + 1
+		elif os.path.isdir(path):
+			count = count + countFilesNum(path)
+	return count
+
+def generateListFile(dir, filesNum):
 	global f_error
 	f_list_file = open(LIST_FILE_NAME, "w+")
+
+	checkedFilesNum = 0;
 
 	for i in range(0, 24):
 		hour = "%02d" % i
@@ -19,8 +34,7 @@ def generateListFile(dir):
 				minute = "%02d" % j
 				minuteStr = str(minute)
 				minuteFilePath = hourFolderPath + "/" + minuteStr + FILE_EXT
-				if os.path.exists(minuteFilePath):
-
+				if os.path.isfile(minuteFilePath) and minuteFilePath.endswith(FILE_EXT):					
 					t=os.popen('ffmpeg -v error -i ' + '\"' + minuteFilePath + '\"' + ' -f null - 2>&1').read()
 					if (t.find('atom not found') >= 0):
 						print 'file cannot open: ' + minuteFilePath
@@ -28,6 +42,9 @@ def generateListFile(dir):
 					else:
 						f_list_file.write("file " + "\'" + minuteFilePath + "\'" + "\n")
 
+					checkedFilesNum = checkedFilesNum + 1
+
+					print_progress.print_progress(checkedFilesNum, filesNum, prefix = 'Progress:', suffix = 'Complete', bar_length = 50)
 					# try:
 					# 	f_minuteFile = open(minuteFilePath)
 					# 	f_list_file.write("file " + "\'" + minuteFilePath + "\'" + "\n")
@@ -55,8 +72,20 @@ if __name__ == '__main__':
 			# if dateToConcat == '2017-05-22':
 			# 	continue
 			dateFolderPath = dataRootPath + "/" + dateToConcat
-			generateListFile(dateFolderPath)
-			concatMediaFiles(dateToConcat)
+			filesNum = countFilesNum(dateFolderPath)
+			if filesNum <= 0:
+				print 'date ' + dateToConcat + ' has no files of extention ' + FILE_EXT
+			else:
+				print 'total files Num for date ' + dateToConcat + ' is ' + str(filesNum)
+				print_progress.print_progress(0, filesNum, prefix = 'Progress:', suffix = 'Complete', bar_length = 50)
+
+				timeBegin = datetime.datetime.now()
+
+				generateListFile(dateFolderPath, filesNum)
+				concatMediaFiles(dateToConcat)
+
+				timeEnd = datetime.datetime.now()
+				print("process date " + dateToConcat + "Cost:", str(timeEnd-timeBegin))
 
 		f_error.close()
 

@@ -1,1 +1,1 @@
-python concatMediaFiles.py "/Volumes/NO NAME/360cam/"
+python concatMediaFiles.py "/Volumes/MultiOS_Use/Temp/360videos/"
