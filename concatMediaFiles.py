@@ -36,7 +36,7 @@ def generateListFile(dir, filesNum):
 				minuteFilePath = hourFolderPath + "/" + minuteStr + FILE_EXT
 				if os.path.isfile(minuteFilePath) and minuteFilePath.endswith(FILE_EXT):					
 					t=os.popen('ffmpeg -v error -i ' + '\"' + minuteFilePath + '\"' + ' -f null - 2>&1').read()
-					if (t.find('atom not found') >= 0):
+					if (t.find('atom not found') >= 0) or (t.find('error reading header') >= 0):
 						print 'file cannot open: ' + minuteFilePath
 						f_error.write('file cannot open: ' + minuteFilePath + "\n")
 					else:
